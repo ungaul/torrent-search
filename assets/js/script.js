@@ -35,7 +35,7 @@ $(document).ready(function () {
             updateUrl(query, page, sortBy, order, category, resultsPerPage);
 
             // Fetch results from the server
-            $.getJSON('https://ungaul-torrent-search.netlify.app/search', { query: query, page: page, sortBy: sortBy, order: order, category: category, resultsPerPage: resultsPerPage }, function (data) {
+            $.getJSON('https://torrent-search-6olt.onrender.com/search', { query: query, page: page, sortBy: sortBy, order: order, category: category, resultsPerPage: resultsPerPage }, function (data) {
                 if (data.error) {
                     $('#results').html('<p>Error: ' + data.error + '</p>');
                 } else {
