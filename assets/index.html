@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1337x Torrent Search</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/assets/js/script.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div id="search-container">
+      <input type="text" id="search-bar" placeholder="Search for torrents...">
+      <button id="search-button"><ion-icon name="search-outline"></ion-icon></button>
+    </div>
+
+    <div id="filters-container">
+      <label for="results-per-page">Results per page:</label>
+      <select id="results-per-page">
+        <option value="20">20</option>
+        <option value="40">40</option>
+        <option value="60">60</option>
+        <option value="80">80</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <div id="results-container">
+      <div id="results">
+        <!-- Headers for the columns -->
+        <div class="header-row">
+          <div class="header-cell name" data-column="name" data-order="desc">Name</div>
+          <div class="header-cell seeders" data-column="seeders" data-order="desc">Seeders</div>
+          <div class="header-cell leechers" data-column="leechers" data-order="desc">Leechers</div>
+          <div class="header-cell time" data-column="time" data-order="desc">Upload Date</div>
+          <div class="header-cell size" data-column="size" data-order="desc">Size</div>
+          <div class="header-cell magnet-link">Magnet Link</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading-indicator">
+      <p>Loading more results...</p>
+    </div>
+
+    <button id="load-more-button">Load More</button>
+  </div>
+</body>
+
+</html>
