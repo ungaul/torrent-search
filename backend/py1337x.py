@@ -1,7 +1,7 @@
 import cloudscraper
 import requests_cache
 
-from py1337x import parser
+# from py1337x import parser
 
 
 class py1337x():
