@@ -1,5 +1,6 @@
-Flask==2.1.1
-Py1337x==0.3
+Flask==2.0.3
+Werkzeug==2.0.3
+py1337x==0.3
 beautifulsoup4==4.10.0
 requests==2.26.0
-gunicorn
+gunicorn==20.1.0
