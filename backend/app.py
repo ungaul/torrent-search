@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory
-from py1337x import py1337x
+from backend.py1337x import py1337x
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
