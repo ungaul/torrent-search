@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 from py1337x import py1337x
 
-app = Flask(__name__, static_folder='assets', static_url_path='/assets')
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Initialize py1337x
 torrents = py1337x(proxy='1337x.to')
@@ -9,7 +9,7 @@ torrents = py1337x(proxy='1337x.to')
 # Route to serve index.html
 @app.route('/')
 def serve_index():
-    return send_from_directory('assets', 'index.html')
+    return send_from_directory('templates', 'index.html')
 
 # Route for searching torrents
 @app.route('/search')
