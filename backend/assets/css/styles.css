@@ -54,7 +54,7 @@ body {
 }
 
 input:-internal-autofill-selected {
-  background: var(--background);
+  background-color: var(--background) !important;
 }
 
 #search-container {
