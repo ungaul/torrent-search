@@ -22,9 +22,12 @@ $(document).ready(function () {
         window.history.pushState({}, '', newUrl);  // Update the URL without refreshing the page
     }
 
-    // Function to handle searching
-    function handleSearch(query, page, sortBy = 'seeders', order = 'desc', category = '', append = false) {
+    // Function to handle searching, including loading multiple pages if needed
+    function handleSearch(query, page, sortBy = 'seeders', order = 'desc', category = '', append = false, totalResults = 0) {
         if (query) {
+            // Remove the 'home-toggled' class to reveal the results table
+            $('#results-container').removeClass('home-toggled');
+
             if (!append) {
                 $('#results .result-row').remove();  // Clear previous results only if append is false
             }
@@ -35,13 +38,17 @@ $(document).ready(function () {
             updateUrl(query, page, sortBy, order, category, resultsPerPage);
 
             // Fetch results from the server
-            $.getJSON('https://torrent-search-6olt.onrender.com/search', { query: query, page: page, sortBy: sortBy, order: order, category: category, resultsPerPage: resultsPerPage }, function (data) {
+            $.getJSON('/search', { query: query, page: page, sortBy: sortBy, order: order, category: category }, function (data) {
                 if (data.error) {
                     $('#results').html('<p>Error: ' + data.error + '</p>');
                 } else {
                     generateResults(data.items);
                     $('#loading-indicator').hide();  // Hide loading indicator
-                    if (page < data.pageCount) {
+
+                    // If we have not yet fetched enough results, load more pages
+                    if (totalResults + data.items.length < resultsPerPage && page < data.pageCount) {
+                        handleSearch(query, page + 1, sortBy, order, category, true, totalResults + data.items.length);
+                    } else if (page < data.pageCount) {
                         $('#load-more-button').show();  // Show Load More button if more pages are available
                     }
                 }
@@ -67,7 +74,7 @@ $(document).ready(function () {
     $('#results-per-page').on('change', function () {
         resultsPerPage = $(this).val();  // Update the number of results per page
         currentPage = 1;  // Reset to first page
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);  // Re-fetch results with updated resultsPerPage
+        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory, false);  // Re-fetch results with updated resultsPerPage
     });
 
     // Function to handle loading more results
@@ -143,6 +150,7 @@ $(document).ready(function () {
 
     if (query) {
         $('#search-bar').val(query);  // Set the query in the search bar
+        $('#results-per-page').val(resultsPerPageParam);  // Set the value in the results-per-page select dropdown
         currentQuery = query;
         currentPage = parseInt(page);  // Set the current page from the URL
         currentSortBy = sortBy;

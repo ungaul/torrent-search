@@ -5,22 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>1337x Torrent Search</title>
-  <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="/static/js/script.js"></script>
+  <script src="/assets/js/script.js"></script>
+  <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 
 <body>
-  <div id="app">
-    <div id="search-container">
+  <div id="app" class="home-toggled">
+    <div id="search-container" class="home-toggled">
       <input type="text" id="search-bar" placeholder="Search for torrents...">
       <button id="search-button"><ion-icon name="search-outline"></ion-icon></button>
     </div>
 
-    <div id="filters-container">
+    <div id="filters-container" class="home-toggled">
       <label for="results-per-page">Results per page:</label>
       <select id="results-per-page">
         <option value="20">20</option>
@@ -31,7 +31,7 @@
       </select>
     </div>
 
-    <div id="results-container">
+    <div id="results-container" class="home-toggled">
       <div id="results">
         <!-- Headers for the columns -->
         <div class="header-row">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div id="loading-indicator">
+    <div id="loading-indicator" class="home-toggled">
       <p>Loading more results...</p>
     </div>
 

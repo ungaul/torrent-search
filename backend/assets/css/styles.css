@@ -11,6 +11,11 @@
   --column-5: 100px;
   --column-6: 100px;
   --scrollbar-width: 10px;
+  --app-gap: 20px;
+  --app-padding: 20px;
+  --link-cursor: url(/assets/cursors/Link.cur), pointer;
+  --default-cursor: url(/assets/cursors/Normal.cur), default;
+  --text-cursor: url(/assets/cursors/Text.cur), text;
 }
 
 * {
@@ -18,6 +23,7 @@
   color: var(--second);
   font-family: Arial, Helvetica, sans-serif;
   text-decoration: none;
+  transition: opacity 0.5s ease-in-out;
 }
 
 a {
@@ -38,8 +44,17 @@ body {
   flex-direction: column;
   width: 100vw;
   height: 100vh;
-  gap: 20px;
-  padding: 20px;
+  gap: var(--app-gap);
+  padding: var(--app-padding);
+}
+
+#app.home-toggled {
+  display: flex;
+  justify-content: center;
+}
+
+input:-internal-autofill-selected {
+  background: var(--background);
 }
 
 #search-container {
@@ -85,9 +100,24 @@ body {
   overflow: hidden;
 }
 
+.home-toggled {
+  display: none;
+}
+
+#search-container.home-toggled {
+  display: flex;
+}
+
+#results-container:not(.home-toggled),
+#loading-indicator:not(.home-toggled),
+#filters-container:not(.home-toggled) {
+  display: flex;
+}
+
 #results {
+  width: 100%;
   height: 100%;
-  padding-bottom: 38.4px;
+  /* padding-bottom: 38.4px; */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -105,6 +135,7 @@ body {
   font-weight: bold;
   border-bottom: 2px solid var(--third);
   padding: 10px 0;
+  cursor: var(--link-cursor);
 }
 
 .result-row {
@@ -120,11 +151,28 @@ body {
   margin-right: 0;
 }
 
+.result-cell.name {
+  padding: 0 !important;
+  padding-right: 10px;
+}
+
+.header-cell.name {
+  padding-left: 10px;
+}
+
 .result-cell {
   padding: 10px 0;
   white-space: nowrap;
   text-overflow: ellipsis;
   flex-shrink: 0;
+}
+
+.result-cell a {
+  width: 100%;
+  display: block;
+  padding: 10px;
+  text-overflow: ellipsis;
+  overflow: clip;
 }
 
 .name {
@@ -133,7 +181,7 @@ body {
   text-decoration: none;
 }
 
-#load-more-button{
+#load-more-button {
   border-radius: 100px;
   padding: 10px;
   color: var(--third);
@@ -152,6 +200,9 @@ body {
 
 .header-row {
   display: flex;
+  position: sticky;
+  /* top: calc(var(--search-height) + var(--app-gap) + var(--app-padding)); */
+  top: 0;
 }
 
 .seeders {
@@ -166,25 +217,21 @@ body {
   width: var(--column-4);
 }
 
-.size{
+.size {
   width: var(--column-5);
 }
 
-.magnet-link{
+.magnet-link {
   width: var(--column-6);
 }
 
-select{
+select {
   background: var(--background);
 }
 
 .magnet-link {
   width: var(--column-5);
   padding: 0;
-}
-
-.name {
-  padding: 10px !important;
 }
 
 .header-cell.magnet-link {
