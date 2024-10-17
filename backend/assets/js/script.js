@@ -23,13 +23,11 @@ $(document).ready(function () {
     }
 
     function startLoadingBar() {
-        if ($('#results-container').hasClass('home-toggled')) {
-            $('#loading-bar-container').show();
-            $('#loading-bar').removeClass('loading-bar-animate');
-            setTimeout(function () {
-                $('#loading-bar').addClass('loading-bar-animate');
-            }, 10);
-        }
+        $('#loading-bar-container').show();
+        $('#loading-bar').removeClass('loading-bar-animate');
+        setTimeout(function () {
+            $('#loading-bar').addClass('loading-bar-animate');
+        }, 10);
     }
 
     function resetLoadingBar() {
@@ -45,7 +43,7 @@ $(document).ready(function () {
                 currentPage = 1;
                 totalResultsFetched = 0;
                 isCancelled = false;
-                startLoadingBar();
+                startLoadingBar(); // Start the loading bar when clearing the list
             }
 
             $('#load-more-button').hide();
@@ -218,21 +216,21 @@ $(document).ready(function () {
 
         handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);
     }
+});
 
-    window.addEventListener('message', function (event) {
-        if (event.data.type === 'updateParams') {
-            const params = event.data.params;
-            if (params) {
-                const searchParams = new URLSearchParams(params);
-                const query = searchParams.get('query');
-                const sortBy = searchParams.get('sortBy');
-                const order = searchParams.get('order');
-                const category = searchParams.get('category');
-                if (query) {
-                    window.history.pushState({}, '', `?${params}`);
-                    handleSearch(query, 1, sortBy, order, category);
-                }
+window.addEventListener('message', function (event) {
+    if (event.data.type === 'updateParams') {
+        const params = event.data.params;
+        if (params) {
+            const searchParams = new URLSearchParams(params);
+            const query = searchParams.get('query');
+            const sortBy = searchParams.get('sortBy');
+            const order = searchParams.get('order');
+            const category = searchParams.get('category');
+            if (query) {
+                window.history.pushState({}, '', `?${params}`);
+                handleSearch(query, 1, sortBy, order, category);
             }
         }
-    });
+    }
 });

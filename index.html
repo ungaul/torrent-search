@@ -10,22 +10,7 @@
 </head>
 
 <body>
-    <iframe id="render-iframe" src="https://torrent-search-6olt.onrender.com/" frameborder="0"
-        style="width: 100%; height: 100vh;"></iframe>
+    <iframe src="https://torrent-search-6olt.onrender.com/" frameborder="0"></iframe>
 </body>
-
-<script>
-    function sendParamsToIframe() {
-        const iframe = document.getElementById('render-iframe');
-        const params = new URLSearchParams(window.location.search);
-        iframe.contentWindow.postMessage({
-            type: 'updateParams',
-            params: params.toString(),
-        }, '*');
-    }
-
-    window.onload = sendParamsToIframe;
-    window.addEventListener('popstate', sendParamsToIframe);
-</script>
 
 </html>
