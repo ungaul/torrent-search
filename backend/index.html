@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>1337x Torrent Search</title>
+  <title>Torrent Search</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/assets/js/script.js"></script>
@@ -17,18 +17,22 @@
   <div id="app" class="home-toggled">
     <div id="search-container" class="home-toggled">
       <input type="text" id="search-bar" placeholder="Search for torrents...">
+      <div id="filters-container">
+        <label for="category-select">Category:</label>
+        <select id="category-select">
+          <option value="">All</option>
+          <option value="movies">Movies</option>
+          <option value="tv">TV</option>
+          <option value="games">Games</option>
+          <option value="music">Music</option>
+          <option value="apps">Apps</option>
+          <option value="anime">Anime</option>
+          <option value="documentaries">Documentaries</option>
+          <option value="xxx">XXX</option>
+          <option value="others">Others</option>
+        </select>
+      </div>
       <button id="search-button"><ion-icon name="search-outline"></ion-icon></button>
-    </div>
-
-    <div id="filters-container" class="home-toggled">
-      <label for="results-per-page">Results per page:</label>
-      <select id="results-per-page">
-        <option value="20">20</option>
-        <option value="40">40</option>
-        <option value="60">60</option>
-        <option value="80">80</option>
-        <option value="100">100</option>
-      </select>
     </div>
 
     <div id="results-container" class="home-toggled">
@@ -36,17 +40,21 @@
         <!-- Headers for the columns -->
         <div class="header-row">
           <div class="header-cell name" data-column="name" data-order="desc">Name</div>
-          <div class="header-cell seeders" data-column="seeders" data-order="desc">Seeders</div>
-          <div class="header-cell leechers" data-column="leechers" data-order="desc">Leechers</div>
-          <div class="header-cell time" data-column="time" data-order="desc">Upload Date</div>
-          <div class="header-cell size" data-column="size" data-order="desc">Size</div>
+          <div class="header-cell seeders" data-column="seeders" data-order="desc">Seeders<ion-icon name="chevron-down-outline"></ion-icon></div>
+          <div class="header-cell leechers" data-column="leechers" data-order="desc">Leechers<ion-icon name="chevron-down-outline"></ion-icon></div>
+          <div class="header-cell time" data-column="time" data-order="desc">Upload Date<ion-icon name="chevron-down-outline"></ion-icon></div>
+          <div class="header-cell size" data-column="size" data-order="desc">Size<ion-icon name="chevron-down-outline"></ion-icon></div>
           <div class="header-cell magnet-link">Magnet Link</div>
         </div>
       </div>
     </div>
 
+    <div id="loading-bar-container">
+      <div id="loading-bar"></div>
+    </div>
+
     <div id="loading-indicator" class="home-toggled">
-      <p>Loading more results...</p>
+      <p>Loading results...</p>
     </div>
 
     <button id="load-more-button">Load More</button>

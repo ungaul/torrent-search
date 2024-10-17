@@ -1,95 +1,126 @@
 $(document).ready(function () {
     let currentPage = 1;
     let currentQuery = '';
-    let currentSortBy = 'seeders';  // Default sort column is 'seeders'
-    let currentOrder = 'desc';  // Default sort order is 'desc'
-    let currentCategory = '';  // Default category (none)
-    let resultsPerPage = 20;  // Default results per page
+    let currentSortBy = 'seeders';
+    let currentOrder = 'desc';
+    let currentCategory = '';
+    let resultsPerPage = 20;
+    let totalResultsFetched = 0;
+    let isCancelled = false;
 
-    // Function to handle updating the URL with current search parameters
-    function updateUrl(query, page, sortBy, order, category, resultsPerPage) {
+    function updateUrl(query, page, sortBy, order, category) {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('query', query);
         newUrl.searchParams.set('page', page);
         newUrl.searchParams.set('sortBy', sortBy);
         newUrl.searchParams.set('order', order);
-        newUrl.searchParams.set('resultsPerPage', resultsPerPage);
         if (category) {
             newUrl.searchParams.set('category', category);
         } else {
-            newUrl.searchParams.delete('category');  // Remove the category if it's empty
+            newUrl.searchParams.delete('category');
         }
-        window.history.pushState({}, '', newUrl);  // Update the URL without refreshing the page
+        window.history.pushState({}, '', newUrl);
     }
 
-    // Function to handle searching, including loading multiple pages if needed
-    function handleSearch(query, page, sortBy = 'seeders', order = 'desc', category = '', append = false, totalResults = 0) {
+    function startLoadingBar() {
+        $('#loading-bar-container').show();
+        $('#loading-bar').removeClass('loading-bar-animate');
+        setTimeout(function () {
+            $('#loading-bar').addClass('loading-bar-animate');
+        }, 10);
+    }
+
+    function resetLoadingBar() {
+        $('#loading-bar').removeClass('loading-bar-animate');
+        $('#loading-bar').css('width', '0');
+        $('#loading-bar-container').hide();
+    }
+
+    function handleSearch(query, page, sortBy = 'seeders', order = 'desc', category = '', append = false, callback = null) {
         if (query) {
-            // Remove the 'home-toggled' class to reveal the results table
-            $('#results-container').removeClass('home-toggled');
-
             if (!append) {
-                $('#results .result-row').remove();  // Clear previous results only if append is false
+                $('#results .result-row').remove();
+                currentPage = 1;
+                totalResultsFetched = 0; 
+                isCancelled = false;
+                startLoadingBar(); // Start the loading bar when clearing the list
             }
-            $('#loading-indicator').show();  // Show loading indicator
-            $('#load-more-button').hide();  // Hide Load More button while loading
 
-            // Update URL with current search parameters
-            updateUrl(query, page, sortBy, order, category, resultsPerPage);
+            $('#load-more-button').hide();
 
-            // Fetch results from the server
+            updateUrl(query, page, sortBy, order, category);
+
             $.getJSON('/search', { query: query, page: page, sortBy: sortBy, order: order, category: category }, function (data) {
+                if (isCancelled) return;
+
                 if (data.error) {
                     $('#results').html('<p>Error: ' + data.error + '</p>');
                 } else {
+                    $('#results-container').removeClass('home-toggled');
+                    $('#app').removeClass('home-toggled');
+                    $('#loading-results').remove();
                     generateResults(data.items);
-                    $('#loading-indicator').hide();  // Hide loading indicator
+                    resetLoadingBar();
 
-                    // If we have not yet fetched enough results, load more pages
-                    if (totalResults + data.items.length < resultsPerPage && page < data.pageCount) {
-                        handleSearch(query, page + 1, sortBy, order, category, true, totalResults + data.items.length);
+                    totalResultsFetched += data.items.length;
+
+                    if (totalResultsFetched < 100 && page < data.pageCount) {
+                        handleSearch(query, page + 1, sortBy, order, category, true, callback);
                     } else if (page < data.pageCount) {
-                        $('#load-more-button').show();  // Show Load More button if more pages are available
+                        $('#load-more-button').show();
                     }
                 }
+
+                if (callback) {
+                    callback();
+                }
             }).fail(function (error) {
-                $('#results').html('<p>Error: ' + error.responseText + '</p>');
-                $('#loading-indicator').hide();  // Hide loading indicator
+                if (!isCancelled) {
+                    $('#results').html('<p>Error: ' + error.responseText + '</p>');
+                    resetLoadingBar();
+                }
+
+                if (callback) {
+                    callback();
+                }
             });
         } else {
             $('#results').html('<p>Please enter a search query.</p>');
         }
     }
 
-    // Event listener for the search button
+    function newSearch(query) {
+        isCancelled = true;
+        currentQuery = query;
+        currentCategory = $('#category-select').val();
+        currentPage = 1;
+        totalResultsFetched = 0; 
+        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);
+    }
+
     $('#search-button').on('click', function () {
-        currentQuery = $('#search-bar').val();
-        currentCategory = $('#category-select').val();  // Get the selected category
-        resultsPerPage = $('#results-per-page').val();  // Get selected number of results per page
-        currentPage = 1;  // Reset to first page on new search
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);  // Call search without appending
+        const query = $('#search-bar').val();
+        newSearch(query);
     });
 
-    // Event listener for changing results per page
-    $('#results-per-page').on('change', function () {
-        resultsPerPage = $(this).val();  // Update the number of results per page
-        currentPage = 1;  // Reset to first page
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory, false);  // Re-fetch results with updated resultsPerPage
+    $('#search-bar').on('keypress', function (e) {
+        if (e.which === 13) {
+            const query = $('#search-bar').val();
+            newSearch(query);
+        }
     });
 
-    // Function to handle loading more results
     $('#load-more-button').on('click', function () {
-        currentPage += 1;  // Increment page number
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory, true);  // Load more results and append them
+        currentPage += 1;
+        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory, true);
     });
 
-    // Function to generate the results using the specified structure
     function generateResults(torrents) {
         let resultsHtml = '';
         torrents.forEach(item => {
-            const time = item.uploadDate || 'Unknown';  // Default value for time if undefined
-            const magnetLink = item.magnetLink || '#';  // Default value for magnet link if undefined
-            const fileSize = item.size || 'Unknown';  // Default value for file size if undefined
+            const time = item.uploadDate || 'Unknown';
+            const magnetLink = item.magnetLink || '#';
+            const fileSize = item.size || 'Unknown';
             resultsHtml += `
                 <div class="result-row">
                     <div class="result-cell name">
@@ -105,24 +136,44 @@ $(document).ready(function () {
                 </div>
             `;
         });
-        $('#results').append(resultsHtml);  // Append new results instead of replacing them
+
+        $('#results').append(resultsHtml);
+
+        $('.result-row').each(function (index) {
+            const row = $(this);
+            setTimeout(function () {
+                row.addClass('visible');
+            }, index * 100);
+        });
     }
 
-    // Function to toggle sorting when clicking on a header
     function toggleSorting(column) {
+        const headerCell = $(`.header-cell.${column}`);
+
         if (currentSortBy === column) {
-            // If the column is already sorted, toggle the order
             currentOrder = currentOrder === 'asc' ? 'desc' : 'asc';
         } else {
-            // If the column is different, set to default descending order
             currentSortBy = column;
-            currentOrder = 'desc';  // Default to descending when switching columns
+            currentOrder = 'desc';
         }
-        currentPage = 1;  // Reset to first page when sorting
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);  // Perform search with new sorting
+
+        $('.header-cell').each(function () {
+            $(this).find('ion-icon').attr('name', 'chevron-down-outline');
+            $(this).removeClass('sortedBy');
+        });
+
+        headerCell.addClass('sortedBy');
+
+        const icon = headerCell.find('ion-icon');
+        if (currentOrder === 'asc') {
+            icon.attr('name', 'chevron-up-outline');
+        } else {
+            icon.attr('name', 'chevron-down-outline');
+        }
+
+        newSearch(currentQuery);
     }
 
-    // Add event listeners for each sortable header
     $('.header-cell.seeders').on('click', function () {
         toggleSorting('seeders');
     });
@@ -132,31 +183,37 @@ $(document).ready(function () {
     });
 
     $('.header-cell.time').on('click', function () {
-        toggleSorting('time');  // Using 'time' for upload date sorting
+        toggleSorting('time');
     });
 
     $('.header-cell.size').on('click', function () {
         toggleSorting('size');
     });
 
-    // Automatically search if a query and page parameters are present in the URL
     const params = new URLSearchParams(window.location.search);
     const query = params.get('query');
-    const page = params.get('page') || 1;  // If no page is provided, default to 1
     const sortBy = params.get('sortBy') || 'seeders';
     const order = params.get('order') || 'desc';
     const category = params.get('category') || '';
-    const resultsPerPageParam = params.get('resultsPerPage') || 20;
 
     if (query) {
-        $('#search-bar').val(query);  // Set the query in the search bar
-        $('#results-per-page').val(resultsPerPageParam);  // Set the value in the results-per-page select dropdown
+        $('#search-bar').val(query);
+        $('#category-select').val(category);
         currentQuery = query;
-        currentPage = parseInt(page);  // Set the current page from the URL
         currentSortBy = sortBy;
         currentOrder = order;
         currentCategory = category;
-        resultsPerPage = resultsPerPageParam;
-        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);  // Trigger search with the page number
+        currentPage = 1;
+
+        const headerCell = $(`.header-cell.${currentSortBy}`);
+        headerCell.addClass('sortedBy');
+        const icon = headerCell.find('ion-icon');
+        if (currentOrder === 'asc') {
+            icon.attr('name', 'chevron-up-outline');
+        } else {
+            icon.attr('name', 'chevron-down-outline');
+        }
+
+        handleSearch(currentQuery, currentPage, currentSortBy, currentOrder, currentCategory);
     }
 });
