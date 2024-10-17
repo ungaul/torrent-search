@@ -5,3 +5,4 @@ beautifulsoup4==4.9.3
 requests==2.26.0
 py1337x==0.3
 cloudscraper==1.2.70
+requests_cache==0.9.8
